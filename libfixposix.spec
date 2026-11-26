@@ -1,15 +1,20 @@
+#
+# Conditional build:
+%bcond_without	tests	# unit tests
+#
 Summary:	Thin wrapper over POSIX syscalls
 Name:		libfixposix
-Version:	0.4.3
+Version:	0.5.1
 Release:	1
 License:	BSD
 Group:		Libraries
 #Source0Download: https://github.com/sionescu/libfixposix/releases
 Source0:	https://github.com/sionescu/libfixposix/archive/v%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	5fbe45bd952977f3298957c6ac109cc4
+# Source0-md5:	0459e0a98cc07372daca0b0614293e15
 URL:		https://github.com/sionescu/libfixposix/
 BuildRequires:	autoconf >= 2.67
 BuildRequires:	automake >= 1:1.10
+%{?with_tests:BuildRequires:	check-devel}
 BuildRequires:	libtool >= 2:2.2.6
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -36,9 +41,14 @@ that use libfixposix library.
 %{__autoheader}
 %{__automake}
 %configure \
-	--disable-silent-rules
+	--disable-silent-rules \
+	--%{?with_tests:en}%{!?with_tests:dis}able-tests
 
 %{__make}
+
+%if %{with tests}
+%{__make} check
+%endif
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -58,7 +68,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 %doc README.md
 %attr(755,root,root) %{_libdir}/libfixposix.so.*.*.*
-%attr(755,root,root) %ghost %{_libdir}/libfixposix.so.3
+%attr(755,root,root) %ghost %{_libdir}/libfixposix.so.4
 
 %files devel
 %defattr(644,root,root,755)
